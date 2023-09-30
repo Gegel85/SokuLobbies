@@ -6,5 +6,7 @@
 #define HISOUTENSOKUDISCORDINTEGRATION_GETPUBLICIP_HPP
 
 const char *getMyIp();
+const char *getMyIpv6();
+bool isIpv6Available();
 
 #endif // HISOUTENSOKUDISCORDINTEGRATION_GETPUBLICIP_HPP
