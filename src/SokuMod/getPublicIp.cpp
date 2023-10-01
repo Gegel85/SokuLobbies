@@ -8,9 +8,11 @@
 #include "data.hpp"
 #include "LobbyData.hpp"
 #include <cstdio>
+#include <mutex>
 
 static char *myIp = nullptr;
-static char *myIpv6 = nullptr;
+static std::mutex myIpv6Mutex;
+static std::string myIpv6("");
 static char buffer[64];
 static wchar_t buffer2[64];
 
@@ -51,23 +53,23 @@ const char *getMyIp()
 	}
 }
 
-const char *getMyIpv6()
+std::string getMyIpv6()
 {
-	if (myIpv6)
-		return myIpv6;
-	try {
-		myIpv6 = strdup(lobbyData->httpRequest("https://api-ipv6.ip.sb/ip", "GET", "", 10000).c_str());
-	} catch (std::exception &e) {
-		printf("Error when getting ipv6: %s\n", e.what());
-		return nullptr;
-	}
-	int len = strlen(myIpv6);
-	if (len > 0 && myIpv6[len-1] == '\n')
-		myIpv6[len-1] = '\0';
-	printf("My ipv6 is %s\n", myIpv6);
-	return myIpv6;
+	myIpv6Mutex.lock();
+	std::string _myIpv6 = myIpv6;
+	myIpv6Mutex.unlock();
+	return _myIpv6;
 }
 
 bool isIpv6Available() {
-	return myIpv6;
+	myIpv6Mutex.lock();
+	bool ret = !myIpv6.empty();
+	myIpv6Mutex.unlock();
+	return ret;
+}
+
+void setMyIpv6(std::string &ipv6) {
+	myIpv6Mutex.lock();
+	myIpv6 = ipv6;
+	myIpv6Mutex.unlock();
 }

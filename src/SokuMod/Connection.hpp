@@ -33,7 +33,6 @@ private:
 	mutable std::mutex _playerMutex;
 	std::thread _netThread;
 	std::thread _posThread;
-	std::thread _getIpv6Thread;
 	bool _connected = true;
 	bool _init = false;
 	char _uniqueId[16];

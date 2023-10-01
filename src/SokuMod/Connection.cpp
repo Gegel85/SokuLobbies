@@ -13,7 +13,7 @@ std::mutex logMutex;
 #include <Exceptions.hpp>
 #include "Connection.hpp"
 #include "getPublicIp.hpp"
-#include "ipv6map_extern.h"
+#include "ipv6map_extern.hpp"
 
 
 extern unsigned char soku2Major;
@@ -193,8 +193,6 @@ bool Connection::_handlePacket(const Lobbies::PacketOlleh &packet, size_t &size)
 	this->_playerMutex.unlock();
 	this->_init = true;
 	this->_posThread = std::thread(&Connection::_posLoop, this);
-	if (hasIpv6Map())
-		this->_getIpv6Thread = std::thread(getMyIpv6);
 	if (this->onConnect)
 		this->onConnect(packet);
 	return true;
@@ -283,15 +281,14 @@ bool Connection::_handlePacket(const Lobbies::PacketGameRequest &packet, size_t 
 		return false;
 	size -= sizeof(packet);
 
-	const char *ipv6 = nullptr, *ip = nullptr;
+	const char *ip = nullptr;
+	std::string ipv6;
 	ip = getMyIp();
-	if (this->_getIpv6Thread.joinable())
-		this->_getIpv6Thread.join();
 	if (isIpv6Available())
 		ipv6 = getMyIpv6();
 
 	unsigned short port = this->onHostRequest();
-	unsigned short port6 = ipv6 ? port : 0;
+	unsigned short port6 = ipv6.empty() ? 0 : port;
 	// if (ipv6)
 	// 	printf("My ipv6: %s\n", ipv6);
 	auto dup = strdup(ip);
@@ -306,7 +303,7 @@ bool Connection::_handlePacket(const Lobbies::PacketGameRequest &packet, size_t 
 		*pos = 0;
 	}
 
-	Lobbies::PacketGameStart game{dup, port, ipv6 ? ipv6 : "", port6, false};
+	Lobbies::PacketGameStart game{dup, port, port6 ? ipv6 : "", port6, false};
 
 	free(dup);
 	this->send(&game, sizeof(game));
@@ -326,8 +323,6 @@ bool Connection::_handlePacket(const Lobbies::PacketGameStart &packet, size_t &s
 		unsigned short port = packet.port;
 		char ipv6[sizeof(packet.ipv6)+1];
 		char ipv6MappedIpv4[16];
-		if (this->_getIpv6Thread.joinable())
-			this->_getIpv6Thread.join();
 		if (isIpv6Available() && packet.port6){
 			strncpy(ipv6, packet.ipv6, sizeof(packet.ipv6));
 			ipv6[sizeof(ipv6)-1] = '\0';
