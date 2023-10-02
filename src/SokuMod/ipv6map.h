@@ -11,7 +11,7 @@
  * `sockaddr6to4` write the IPv6-mapped IPv4 address into out4, and return zero if and only if there is no error.
  * When this function called, a map will be created if the IPv6 address hasn't been mapped, or the
  * mapped IPv4 address will be got from the existing map if the IPv6 address has been mapped.
- * Once a IPv6 address is mapped successful, we can access it by access the IPv6-mapped IPv4 address.
+ * Once a IPv6 address is mapped successfully, we can access it by access the IPv6-mapped IPv4 address.
  * `[::]` will be mapped to `0.0.0.0`, and other IPv6 address will be mapped to `127.127.0.0/16`.
  * The map is stateful, and it is permanent until the process stops. So don't map too many IPv6 addresses.
  * But it is OK to call `sockaddr6to4` on one IPv6 address many times.

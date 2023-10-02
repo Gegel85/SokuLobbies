@@ -387,7 +387,7 @@ InLobbyMenu::InLobbyMenu(LobbyMenu *menu, SokuLib::MenuConnect *parent, Connecti
 		SokuLib::playBGM(this->_music.c_str());
 		if (hasIpv6Map()) {
 			if (isIpv6Available())
-				this->_addMessageToList(0xFFFF00, 0, "You IPv6 Address is: " + getMyIpv6());
+				this->_addMessageToList(0xFFFF00, 0, "Your IPv6 Address is: " + getMyIpv6());
 		} else
 			this->_addMessageToList(0xFFFF00, 0, "IPv6MapSokuMod isn't loaded, so IPv6 will not be supported.");
 	};
@@ -2035,7 +2035,7 @@ void InLobbyMenu::_startHosting()
 		free(dup);
 		try {
 			lobbyData->httpRequest("https://konni.delthas.fr/games", "PUT", data.dump());
-			this->_addMessageToList(0x00FF00, 0, "Broadcast to hostlist successful");
+			this->_addMessageToList(0x00FF00, 0, "Broadcast to hostlist successfully");
 		} catch (std::exception &e) {
 			this->_addMessageToList(0xFF0000, 0, "Hostlist error: " + std::string(e.what()));
 		}
